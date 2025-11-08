@@ -7,10 +7,12 @@ import com.ecom.service.CategoryService;
 import com.ecom.service.ProductService;
 import com.ecom.service.UserService;
 
+import com.ecom.util.CommonUtil;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
@@ -27,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -40,6 +43,24 @@ public class HomeController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private CommonUtil commonUtil;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
+    @ModelAttribute
+    public void getUserDetails(Principal p, Model m) {
+        if (p != null) {
+            String email = p.getName();
+            User user = userService.getUserByEmail(email);
+            m.addAttribute("user", user);
+        }
+
+        List<Category> allActiveCategory = categoryService.getAllActiveCategory();
+        m.addAttribute("categorys", allActiveCategory);
+    }
 
     @GetMapping("/")
     public String index() {
