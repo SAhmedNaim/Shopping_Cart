@@ -3,6 +3,7 @@ package com.ecom.controller;
 import com.ecom.model.Category;
 import com.ecom.model.Product;
 import com.ecom.model.User;
+import com.ecom.service.CartService;
 import com.ecom.service.CategoryService;
 import com.ecom.service.ProductService;
 import com.ecom.service.UserService;
@@ -49,6 +50,9 @@ public class HomeController {
     private UserService userService;
 
     @Autowired
+    private CartService cartService;
+
+    @Autowired
     private CommonUtil commonUtil;
 
     @Autowired
@@ -60,6 +64,9 @@ public class HomeController {
             String email = p.getName();
             User user = userService.getUserByEmail(email);
             m.addAttribute("user", user);
+
+            Integer countCart = cartService.getCountCart(user.getId());
+            m.addAttribute("countCart", countCart);
         }
 
         List<Category> allActiveCategory = categoryService.getAllActiveCategory();
