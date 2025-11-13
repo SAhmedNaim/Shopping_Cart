@@ -3,6 +3,7 @@ package com.ecom.service;
 import java.util.List;
 
 import com.ecom.model.User;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
@@ -28,4 +29,5 @@ public interface UserService {
 
     public User updateUser(User user);
 
+    public User updateUserProfile(User user, MultipartFile img);
 }
