@@ -59,11 +59,13 @@
                 </th:block>
 
                 <th:block th:if="${user!=null}">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/user/cart">
-                            <i class="fa-solid fa-cart-shopping"></i> Cart [ [[${countCart}]] ]
-                        </a>
-                    </li>
+                    <th:block th:if="${user.role=='ROLE_USER'}">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/user/cart">
+                                <i class="fa-solid fa-cart-shopping"></i> Cart [ [[${countCart}]] ]
+                            </a>
+                        </li>
+                    </th:block>
 
                     <li class="nav-item dropdown">
                         <a
@@ -73,7 +75,8 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#">Profile</a></li>
-                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><a class="dropdown-item" href="/user/user-orders">My Orders</a></li>
+                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
                             <li><hr class="dropdown-divider"></li>
                         </ul>
                     </li>
