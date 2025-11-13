@@ -6,6 +6,7 @@ import com.ecom.model.ProductOrder;
 import com.ecom.model.User;
 import com.ecom.service.*;
 
+import com.ecom.util.CommonUtil;
 import com.ecom.util.OrderStatus;
 import jakarta.servlet.http.HttpSession;
 
@@ -49,6 +50,9 @@ public class AdminController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private CommonUtil commonUtil;
 
     @ModelAttribute
     public void getUserDetails(Principal p, Model m) {
@@ -277,14 +281,19 @@ public class AdminController {
             }
         }
 
-        Boolean updateOrder = orderService.updateOrderStatus(id, status);
+        ProductOrder updateOrder = orderService.updateOrderStatus(id, status);
 
-        if (updateOrder) {
+        try {
+            commonUtil.sendMailForProductOrder(updateOrder, status);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (!ObjectUtils.isEmpty(updateOrder)) {
             session.setAttribute("succMsg", "Status Updated");
         } else {
             session.setAttribute("errorMsg", "status not updated");
         }
-
         return "redirect:/admin/orders";
     }
 
