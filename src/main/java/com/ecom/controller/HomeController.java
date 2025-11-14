@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -62,10 +63,9 @@ public class HomeController {
     public void getUserDetails(Principal p, Model m) {
         if (p != null) {
             String email = p.getName();
-            User user = userService.getUserByEmail(email);
-            m.addAttribute("user", user);
-
-            Integer countCart = cartService.getCountCart(user.getId());
+            User userDtls = userService.getUserByEmail(email);
+            m.addAttribute("user", userDtls);
+            Integer countCart = cartService.getCountCart(userDtls.getId());
             m.addAttribute("countCart", countCart);
         }
 
@@ -88,18 +88,32 @@ public class HomeController {
         return "register";
     }
 
-    public String logout() {
-        return "logout";
-    }
-
     @GetMapping("/products")
-    public String products(Model m, @RequestParam(value = "category", defaultValue = "")  String category) {
-        // System.out.println("category="+category);
+    public String products(
+            Model m, @RequestParam(value = "category", defaultValue = "") String category,
+            @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+            @RequestParam(name = "pageSize", defaultValue = "9") Integer pageSize
+    ) {
+
         List<Category> categories = categoryService.getAllActiveCategory();
-        List<Product> products = productService.getAllActiveProducts(category);
-        m.addAttribute("categories", categories);
-        m.addAttribute("products", products);
         m.addAttribute("paramValue", category);
+        m.addAttribute("categories", categories);
+
+//		List<Product> products = productService.getAllActiveProducts(category);
+//		m.addAttribute("products", products);
+
+        Page<Product> page = productService.getAllActiveProductPagination(pageNo, pageSize, category);
+        List<Product> products = page.getContent();
+        m.addAttribute("products", products);
+        m.addAttribute("productsSize", products.size());
+
+        m.addAttribute("pageNo", page.getNumber());
+        m.addAttribute("pageSize", pageSize);
+        m.addAttribute("totalElements", page.getTotalElements());
+        m.addAttribute("totalPages", page.getTotalPages());
+        m.addAttribute("isFirst", page.isFirst());
+        m.addAttribute("isLast", page.isLast());
+
         return "product";
     }
 
@@ -123,7 +137,7 @@ public class HomeController {
 
                 Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "profile_img" + File.separator + file.getOriginalFilename());
 
-                System.out.println(path);
+//				System.out.println(path);
                 Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
             }
             session.setAttribute("succMsg", "Register successfully");
@@ -133,6 +147,8 @@ public class HomeController {
 
         return "redirect:/register";
     }
+
+//	Forgot Password Code
 
     @GetMapping("/forgot-password")
     public String showForgotPassword() {
@@ -193,8 +209,8 @@ public class HomeController {
             userByToken.setPassword(passwordEncoder.encode(password));
             userByToken.setResetToken(null);
             userService.updateUser(userByToken);
-            //session.setAttribute("succMsg", "Password change successfully");
-            m.addAttribute("msg","Password change successfully");
+            // session.setAttribute("succMsg", "Password change successfully");
+            m.addAttribute("msg", "Password change successfully");
 
             return "message";
         }
