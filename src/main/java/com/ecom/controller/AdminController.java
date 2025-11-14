@@ -216,14 +216,35 @@ public class AdminController {
     }
 
     @GetMapping("/products")
-    public String loadViewProduct(Model m, @RequestParam(defaultValue = "") String ch) {
-        List<Product> products = null;
+    public String loadViewProduct(
+            Model m, @RequestParam(defaultValue = "") String ch,
+            @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize
+    ) {
+
+//		List<Product> products = null;
+//		if (ch != null && ch.length() > 0) {
+//			products = productService.searchProduct(ch);
+//		} else {
+//			products = productService.getAllProducts();
+//		}
+//		m.addAttribute("products", products);
+
+        Page<Product> page = null;
         if (ch != null && ch.length() > 0) {
-            products = productService.searchProduct(ch);
+            page = productService.searchProductPagination(pageNo, pageSize, ch);
         } else {
-            products = productService.getAllProducts();
+            page = productService.getAllProductsPagination(pageNo, pageSize);
         }
-        m.addAttribute("products", products);
+        m.addAttribute("products", page.getContent());
+
+        m.addAttribute("pageNo", page.getNumber());
+        m.addAttribute("pageSize", pageSize);
+        m.addAttribute("totalElements", page.getTotalElements());
+        m.addAttribute("totalPages", page.getTotalPages());
+        m.addAttribute("isFirst", page.isFirst());
+        m.addAttribute("isLast", page.isLast());
+
         return "admin/products";
     }
 
