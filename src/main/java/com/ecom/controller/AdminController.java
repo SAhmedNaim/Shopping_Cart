@@ -356,7 +356,11 @@ public class AdminController {
     }
 
     @GetMapping("/search-order")
-    public String searchProduct(@RequestParam String orderId, Model m, HttpSession session) {
+    public String searchProduct(
+            @RequestParam String orderId, Model m, HttpSession session,
+            @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize
+    ) {
 
         if (orderId != null && orderId.length() > 0) {
 
@@ -371,11 +375,22 @@ public class AdminController {
 
             m.addAttribute("srch", true);
         } else {
-            List<ProductOrder> allOrders = orderService.getAllOrders();
-            m.addAttribute("orders", allOrders);
-            m.addAttribute("srch", false);
-        }
+//			List<ProductOrder> allOrders = orderService.getAllOrders();
+//			m.addAttribute("orders", allOrders);
+//			m.addAttribute("srch", false);
 
+            Page<ProductOrder> page = orderService.getAllOrdersPagination(pageNo, pageSize);
+            m.addAttribute("orders", page);
+            m.addAttribute("srch", false);
+
+            m.addAttribute("pageNo", page.getNumber());
+            m.addAttribute("pageSize", pageSize);
+            m.addAttribute("totalElements", page.getTotalElements());
+            m.addAttribute("totalPages", page.getTotalPages());
+            m.addAttribute("isFirst", page.isFirst());
+            m.addAttribute("isLast", page.isLast());
+
+        }
         return "/admin/orders";
 
     }
