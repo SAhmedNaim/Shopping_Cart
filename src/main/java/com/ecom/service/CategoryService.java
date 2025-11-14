@@ -3,6 +3,7 @@ package com.ecom.service;
 import java.util.List;
 
 import com.ecom.model.Category;
+import org.springframework.data.domain.Page;
 
 public interface CategoryService {
 
@@ -17,5 +18,7 @@ public interface CategoryService {
     public Category getCategoryById(int id);
 
     public List<Category> getAllActiveCategory();
+
+    public Page<Category> getAllCategoryPagination(Integer pageNo, Integer pageSize);
 
 }
