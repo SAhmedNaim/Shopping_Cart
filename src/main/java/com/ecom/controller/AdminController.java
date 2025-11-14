@@ -305,10 +305,25 @@ public class AdminController {
     }
 
     @GetMapping("/orders")
-    public String getAllOrders(Model m) {
-        List<ProductOrder> allOrders = orderService.getAllOrders();
-        m.addAttribute("orders", allOrders);
+    public String getAllOrders(
+            Model m, @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize
+    ) {
+//		List<ProductOrder> allOrders = orderService.getAllOrders();
+//		m.addAttribute("orders", allOrders);
+//		m.addAttribute("srch", false);
+
+        Page<ProductOrder> page = orderService.getAllOrdersPagination(pageNo, pageSize);
+        m.addAttribute("orders", page.getContent());
         m.addAttribute("srch", false);
+
+        m.addAttribute("pageNo", page.getNumber());
+        m.addAttribute("pageSize", pageSize);
+        m.addAttribute("totalElements", page.getTotalElements());
+        m.addAttribute("totalPages", page.getTotalPages());
+        m.addAttribute("isFirst", page.isFirst());
+        m.addAttribute("isLast", page.isLast());
+
         return "/admin/orders";
     }
 
