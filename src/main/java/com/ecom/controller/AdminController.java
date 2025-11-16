@@ -406,16 +406,17 @@ public class AdminController {
     }
 
     @GetMapping("/add-admin")
-    public String loadAdminAdd() {
+    public String loadAdminAdd(Model m) {
+        m.addAttribute("newUser", new User());
         return "/admin/add_admin";
     }
 
     @PostMapping("/save-admin")
-    public String saveAdmin(@ModelAttribute User user, @RequestParam("img") MultipartFile file, HttpSession session) throws IOException {
+    public String saveAdmin(@ModelAttribute("newUser") User userAdmin, @RequestParam("img") MultipartFile file, HttpSession session) throws IOException {
 
         String imageName = file.isEmpty() ? "default.jpg" : file.getOriginalFilename();
-        user.setProfileImage(imageName);
-        User saveUser = userService.saveAdmin(user);
+        userAdmin.setProfileImage(imageName);
+        User saveUser = userService.saveAdmin(userAdmin);
 
         if (!ObjectUtils.isEmpty(saveUser)) {
             if (!file.isEmpty()) {
