@@ -33,4 +33,6 @@ public interface UserService {
 
     public User saveAdmin(User user);
 
+    public Boolean existsEmail(String email);
+
 }
